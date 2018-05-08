@@ -1,15 +1,73 @@
 // @flow
 
-import React from 'react';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { getAPIDetails } from './actionCreators';
+import Header from './Header';
+import Spinner from './Spinner';
 
-const Details = props => (
-	<div className="details">
-		<pre>
-			<code>
-				{JSON.stringify(props, null, 4)}
-			</code>
-		</pre>
-	</div>
-);
+const mapStateToProps = (state, ownProps) => {
+	const apiData = state.apiData[ownProps.show.imdbID] ? state.apiData[ownProps.show.imdbID] : {};
+	return {
+		rating: apiData.rating
+	};
+};
+
+const mapDispatchToProps = (dispatch: Function, ownProps) => ({
+	getAPIData() {
+		dispatch(getAPIDetails(ownProps.show.imdbID));
+	}
+});
+
+@connect(mapStateToProps, mapDispatchToProps)
+class Details extends Component {
+	state = {
+		apiData: { imdbRating: '' }
+	};
+
+	componentDidMount() {
+		if (!this.props.rating) {
+			this.props.getAPIData();
+		}
+	}
+
+	props: {
+		rating: string,
+		getAPIData: Function,
+		show: Show
+	};
+
+	render() {
+		const { title, description, year, poster, trailer } = this.props.show;
+
+		let rating;
+		if (this.props.rating) {
+			rating = <h3>{this.props.rating}</h3>;
+		} else {
+			rating = <Spinner />;
+		}
+
+		return (
+			<div className="details">
+				<Header />
+				<section>
+					<h1>{title}</h1>
+					<h2>({year})</h2>
+					{rating}
+					<img src={`/public/img/posters/${poster}`} alt={`Poster for ${title}`} />
+					<p>{description}</p>
+				</section>
+				<div>
+					<iframe
+						title="Show Details Display"
+						src={`https://www.youtube-nocookie.com/embed/${trailer}?rel=0&amp;controls=0&amp;showinfo=0`}
+						frameBorder="0"
+						allowFullScreen
+					/>
+				</div>
+			</div>
+		);
+	}
+}
 
 export default Details;

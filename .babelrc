@@ -1,7 +1,10 @@
 {
 "plugins": [
   "react-hot-loader/babel",
-  "transform-class-properties"
+  "babel-plugin-syntax-dynamic-import",
+  "babel-plugin-dynamic-import-webpack",
+  "babel-plugin-transform-decorators-legacy",
+  "babel-plugin-transform-class-properties"
 ],
   "presets": [
     "react",
@@ -15,7 +18,14 @@
     ["flow"]
   ],
   "env": {
+    "development": {
+      "plugins": ["transform-es2015-modules-commonjs"]
+    },
+
     "test": {
+      "plugins": ["transform-es2015-modules-commonjs"]
+    },
+    "server": {
       "plugins": ["transform-es2015-modules-commonjs"]
     }
   }
